@@ -1,0 +1,9 @@
+{
+  "connectionString": "InstrumentationKey=824572cf-7b0c-4a78-ab00-6fecf0050763;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/",
+  "role": {
+    "name": "AzureApplcationMap",
+    "instance": "baardl"
+  }
+}
+
+
