@@ -51,17 +51,10 @@
       <artifactId>opentelemetry-sdk</artifactId>
       <version>1.32.0</version>
     </dependency>
-    <!--
-    <dependency>
-        <groupId>io.opentelemetry</groupId>
-        <artifactId>opentelemetry-exporter-logging</artifactId>
-        <version>1.32.0</version>
-    </dependency>
-    -->
     <dependency>
       <groupId>io.opentelemetry</groupId>
       <artifactId>opentelemetry-semconv</artifactId>
-      <version>0.14.1</version>
+      <version>1.30.1-alpha</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
@@ -83,12 +76,6 @@
       <groupId>com.azure</groupId>
       <artifactId>azure-data-appconfiguration</artifactId>
       <version>1.5.0</version>
-    </dependency>
-    <!--Simulator-->
-    <dependency>
-      <groupId>org.wiremock</groupId>
-      <artifactId>wiremock</artifactId>
-      <version>3.3.1</version>
     </dependency>
 
     <!-- HTTP Client -->
