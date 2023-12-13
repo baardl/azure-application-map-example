@@ -30,6 +30,7 @@ public class Application {
             System.exit(1);
         }
         Application application = new Application();
+
         String instrumentationConnectionString = properties.getProperty("instrumentation.connectionString");
         if (hasValue(instrumentationConnectionString)) {
             application.runExternalRestSimulator(instrumentationConnectionString);

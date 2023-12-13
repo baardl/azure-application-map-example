@@ -23,10 +23,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class ExternalRestSimulator implements Runnable {
     private static final Logger log = getLogger(ExternalRestSimulator.class);
 
-    private final String connectionString;
+    private final String instrumentationConnectionString;
 
-    public ExternalRestSimulator(String connectionString) {
-        this.connectionString = connectionString;
+    public ExternalRestSimulator(String instrumentationConnectionString) {
+        this.instrumentationConnectionString = instrumentationConnectionString;
     }
 
 
@@ -34,7 +34,7 @@ public class ExternalRestSimulator implements Runnable {
     public void run() {
         AutoConfiguredOpenTelemetrySdkBuilder sdkBuilder = AutoConfiguredOpenTelemetrySdk.builder();
         new AzureMonitorExporterBuilder()
-                .connectionString(connectionString)
+                .connectionString(instrumentationConnectionString)
                 .install(sdkBuilder);
 
         OpenTelemetry openTelemetry = sdkBuilder.build().getOpenTelemetrySdk();
@@ -46,7 +46,7 @@ public class ExternalRestSimulator implements Runnable {
         for (int i = 0; i < 5; i++) {
 
 
-            Span span = tracer.spanBuilder("sample-span").startSpan();
+            Span span = tracer.spanBuilder("ExernalRestSimulatorSpan").startSpan();
             final Scope scope = span.makeCurrent();
             try {
                 span.setAttribute("appName", "sample-app");
@@ -65,7 +65,7 @@ public class ExternalRestSimulator implements Runnable {
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 span.setAttribute("http.response.status_code", response.statusCode());
 //                counter.add(1);
-                System.out.println(response.body());
+//                System.out.println(response.body());
                 span.end();
                 scope.close();
             } catch (URISyntaxException e) {
