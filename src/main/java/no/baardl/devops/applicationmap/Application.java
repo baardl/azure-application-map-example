@@ -1,5 +1,8 @@
 package no.baardl.devops.applicationmap;
 
+import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.telemetry.Duration;
+import com.microsoft.applicationinsights.telemetry.RemoteDependencyTelemetry;
 import com.microsoft.azure.sdk.iot.device.Message;
 import com.microsoft.azure.sdk.iot.device.MessageSentCallback;
 import com.microsoft.azure.sdk.iot.device.MessageType;
@@ -74,16 +77,28 @@ public class Application {
     }
 
     private void runIotHubClient(String iotHubConnectionString) {
+        TelemetryClient telemetryClient = new TelemetryClient();
         AzureDeviceClient azureDeviceClient = new AzureDeviceClient(iotHubConnectionString);
         azureDeviceClient.openConnection();
         for (int i = 0; i < 5; i++) {
+            long startTime = System.currentTimeMillis();
             Message telemetryMessage = buildTelemetryMessage("TestSensor", i);
             azureDeviceClient.sendEventAsync(telemetryMessage, new MessageSentCallback() {
                 @Override
                 public void onMessageSent(Message message, IotHubClientException e, Object o) {
+                    long elapsedTime = System.currentTimeMillis() - startTime;
+                    Duration duration = new Duration(elapsedTime);
+                    RemoteDependencyTelemetry dependencyTelemetry = new RemoteDependencyTelemetry("IotHub", "SendEventAsync", duration, true);
+                    dependencyTelemetry.setTarget("IotHubNorway.messom.no");
+                    dependencyTelemetry.setType("PC"); //--> Device_Type=PC, need Client_Type=PC
+                    //koble denne målingen til en eller annen "parent"
                     if (e != null) {
+                        dependencyTelemetry.setSuccess(false);
+                        telemetryClient.trackDependency(dependencyTelemetry);
                         log.error("Error sending message", e);
                     } else {
+                        //telemetryClient.TrackDependency("myDependencyType", "myDependencyCall", "myDependencyData",  startTime, timer.Elapsed, success);
+                        telemetryClient.trackDependency(dependencyTelemetry);
                         log.info("Message sent: {}", message);
                     }
                 }
@@ -92,8 +107,15 @@ public class Application {
                 log.info("Sleeping 1 second");
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                log.error("Interrupted", e);
+                log.info("Interrupted", e);
             }
+        }
+        telemetryClient.flush();
+        try {
+            log.info("Flushed, now sleeping 2 seconds");
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            log.info("Interrupted", e);
         }
         azureDeviceClient.closeConnection();
     }
